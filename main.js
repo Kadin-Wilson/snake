@@ -13,50 +13,56 @@ const cellSize = 50;
 const segmentMargin = 4;
 const segmentSize = cellSize - segmentMargin * 2;
 
-const snakeStartSize = 5;
+const snakeStartSize = 7;
 
 // create snake
-let snake = new Snake(WIDTH/cellSize, HEIGHT/cellSize, 12, 8, snakeStartSize);
+let snake = new Snake(WIDTH/cellSize, HEIGHT/cellSize, 12, 6, snakeStartSize);
 
 
 // frames per move
-const moveTick = 12;
+const moveTick = 10;
 const animationIncriment = cellSize / moveTick;
 
 let tick = 0;
-let previousTime = 0;
 let nextFrame = null;
 
 // initial draw
-draw();
-// start game loop
-gameLoop();
+drawGrid();
+fadeBlack(0.7);
+ctx.fillStyle = 'white';
+ctx.font = `bold ${3*cellSize}px serif`;
+ctx.fillText('Press Space', WIDTH/25, HEIGHT/3);
+ctx.fillText('To Start', WIDTH/6, HEIGHT/3*2);
 
+// wait for game start
+document.addEventListener('keyup', start);
 
-// key listeners
-document.addEventListener('keydown', (event) => {
-    const keyName = event.key;
+function start(e) {
+    if (e.key == ' ') {
+        // key listeners
+        document.addEventListener('keydown', (event) => {
+            const keyName = event.key;
 
-    if (keyName == 'ArrowLeft')
-        snake.changeDirection('left');
-    if (keyName == 'ArrowRight')
-        snake.changeDirection('right');
-    if (keyName == 'ArrowUp')
-        snake.changeDirection('up');
-    if (keyName == 'ArrowDown')
-        snake.changeDirection('down');
-});
+            if (keyName == 'ArrowLeft')
+                snake.changeDirection('left');
+            if (keyName == 'ArrowRight')
+                snake.changeDirection('right');
+            if (keyName == 'ArrowUp')
+                snake.changeDirection('up');
+            if (keyName == 'ArrowDown')
+                snake.changeDirection('down');
+        });
+
+        // start gameloop
+        gameLoop();
+        document.removeEventListener(start);
+    }
+}
+
 
 function gameLoop(currentTime) {
     nextFrame = requestAnimationFrame(gameLoop);
-
-    // convert to seconds
-    currentTime *= 0.001;
-    // time passed since last frame
-    const deltaTime = currentTime - previousTime;
-    // remeber time for next frame
-    previousTime = currentTime;
-
+    
     ++tick;
     if (tick > moveTick) {
         snake.move();
@@ -67,9 +73,8 @@ function gameLoop(currentTime) {
         }
         tick = 0;
     }
+
     draw();
-    ctx.font = 'bold 15 serif'
-    ctx.fillText(`fps: ${1/deltaTime}`,10, 10)
 }
 
 function draw() {
@@ -78,13 +83,7 @@ function draw() {
     ctx.fillRect(0, 0, WIDTH, HEIGHT);
 
     // draw grid
-    for (let i = 0; i <= WIDTH; i += cellSize)
-        for (let j = 0; j <= HEIGHT; j += cellSize) {
-            ctx.fillStyle = `hsl(${i + j}, 100%, 60%`;
-            ctx.beginPath();
-            ctx.arc(i, j, 3, 0, 7);
-            ctx.fill();
-        }
+    drawGrid();
 
     // draw coin
     const coin = snake.getCoin();
@@ -115,10 +114,7 @@ function draw() {
 }
 
 function gameover() {
-    ctx.globalAlpha = 0.7;
-    ctx.fillStyle = 'black';
-    ctx.fillRect(0, 0, WIDTH, HEIGHT);
-    ctx.globalAlpha = 1;
+    fadeBlack(0.7);
 
     ctx.fillStyle = 'darkred';
     ctx.font = `bold ${3*cellSize}px serif`;
@@ -128,4 +124,21 @@ function gameover() {
     ctx.font = `bold ${1.5*cellSize}px serif`;
     ctx.fillText(`Score: ${snake.segments.length - snakeStartSize}`,
                  WIDTH/4, HEIGHT/2 + 1.5*cellSize);
+}
+
+function drawGrid() {
+    for (let i = 0; i <= WIDTH; i += cellSize)
+        for (let j = 0; j <= HEIGHT; j += cellSize) {
+            ctx.fillStyle = `hsl(${i + j}, 100%, 60%`;
+            ctx.beginPath();
+            ctx.arc(i, j, 3, 0, 7);
+            ctx.fill();
+        }
+}
+
+function fadeBlack(alpha) {
+    ctx.globalAlpha = alpha;
+    ctx.fillStyle = 'black';
+    ctx.fillRect(0, 0, WIDTH, HEIGHT);
+    ctx.globalAlpha = 1;
 }
