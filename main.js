@@ -39,10 +39,11 @@ let snake = new Snake(WIDTH/cellSize, HEIGHT/cellSize, 12, 6, snakeStartSize);
 // initial draw
 drawGrid();
 fadeBlack(0.7);
-ctx.fillStyle = 'white';
-ctx.font = `bold ${3*cellSize}px serif`;
-ctx.fillText('Press Space', WIDTH/25, HEIGHT/3);
-ctx.fillText('To Start', WIDTH/6, HEIGHT/3*2);
+ctx.strokeStyle = 'white';
+ctx.lineWidth = 6;
+ctx.font = `bold ${3*cellSize}px sans-serif`;
+ctx.strokeText('Press Space', WIDTH/25, HEIGHT/3);
+ctx.strokeText('To Start', WIDTH/6, HEIGHT/3*2);
 
 // gameloop variables
 let tick = 0;
@@ -99,40 +100,43 @@ function draw() {
     const coin = snake.getCoin();
     const cx = coin.x * cellSize + cellSize/2;
     const cy = coin.y * cellSize + cellSize/2;
-    ctx.fillStyle = `hsl(${cx + cy}, 100%, 60%`;
+    ctx.strokeStyle = `hsl(${cx + cy}, 100%, 60%`;
+    ctx.lineWidth = 3;
     ctx.beginPath();
     ctx.arc(cx, cy, cellSize/2.5, 0, 7);
-    ctx.fill();
+    ctx.stroke();
 
     
     // draw snake
-    ctx.fillStyle = 'white';
+    ctx.lineWidth = 2;
     for (let segment of snake) {
         let x = segment.x * cellSize + segmentMargin;
         let y = segment.y * cellSize + segmentMargin;
         let offset = animationIncriment * tick
 
         if (segment.direction == 'up')
-            ctx.fillRect(x, y + cellSize - offset, segmentSize, segmentSize);
+            ctx.strokeRect(x, y + cellSize - offset, segmentSize, segmentSize);
         if (segment.direction == 'down')
-            ctx.fillRect(x, y - cellSize + offset, segmentSize, segmentSize);
+            ctx.strokeRect(x, y - cellSize + offset, segmentSize, segmentSize);
         if (segment.direction == 'left')
-            ctx.fillRect(x + cellSize - offset, y, segmentSize, segmentSize);
+            ctx.strokeRect(x + cellSize - offset, y, segmentSize, segmentSize);
         if (segment.direction == 'right')
-            ctx.fillRect(x - cellSize + offset, y, segmentSize, segmentSize);
+            ctx.strokeRect(x - cellSize + offset, y, segmentSize, segmentSize);
     }
 }
 
 function gameover() {
-    fadeBlack(0.7);
+    fadeBlack(0.75);
 
-    ctx.fillStyle = 'darkred';
-    ctx.font = `bold ${3*cellSize}px serif`;
-    ctx.fillText('Game Over', WIDTH/12, HEIGHT/2);
+    ctx.lineWidth = 6;
+    ctx.strokeStyle = 'darkred';
+    ctx.font = `bold ${3*cellSize}px sans-serif`;
+    ctx.strokeText('Game Over', WIDTH/12, HEIGHT/2);
 
-    ctx.fillStyle = 'goldenrod';
-    ctx.font = `bold ${1.5*cellSize}px serif`;
-    ctx.fillText(`Score: ${snake.segments.length - snakeStartSize}`,
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = 'goldenrod';
+    ctx.font = `bold ${1.5*cellSize}px sans-serif`;
+    ctx.strokeText(`Score: ${snake.segments.length - snakeStartSize}`,
                  WIDTH/4, HEIGHT/2 + 1.5*cellSize);
 
     // reset snake

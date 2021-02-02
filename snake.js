@@ -5,9 +5,9 @@ class Point {
     }
 }
 class Segment extends Point {
-    constructor(x, y, direct) {
+    constructor(x, y, direction) {
         super(x, y);
-        this.direction = direct;
+        this.direction = direction;
     }
 }
 
@@ -64,6 +64,7 @@ class Snake {
             carry = temp;
         }
 
+        // push final carry to grow the snake
         if (this.grow) {
             this.segments.push(carry);
             this.grow = false;
@@ -72,6 +73,7 @@ class Snake {
 
     changeDirection(direction) {
         // queue the direction we want to move in
+        // direction queue prevents 180 turns
         if (direction == 'left' && this.currentDirection != 'right')
             this.queuedDirection = 'left';
         if (direction == 'right' && this.currentDirection != 'left')
@@ -82,18 +84,22 @@ class Snake {
             this.queuedDirection = 'down';
     }
 
+    // returns true if we collide with something we shouldn't
     checkCollision() {
+        // check if we hit coin
         if (this.segments[0].x == this.coin.x 
             && this.segments[0].y == this.coin.y) {
-            this.setCoin();
-            this.grow = true;
-            return false;
+            this.setCoin(); // place new coin
+            this.grow = true; // flag the snake to grow on next move cycle
+            return false; // the coin point is known safe
         }
 
+        // check wall collisions
         if (this.segments[0].x < 0 || this.segments[0].x >= this.width
             || this.segments[0].y < 0 || this.segments[0].y >= this.height)
             return true;
 
+        // check collisions with other segments
         for (let i = 1; i < this.segments.length; i++)
             if (this.segments[0].x == this.segments[i].x
                 && this.segments[0].y == this.segments[i].y)
@@ -105,13 +111,15 @@ class Snake {
     }
 
     setCoin() {
+        // prevent coin from spawning on snake
         do {
             this.coin = new Point(Math.floor(Math.random() * this.width),
                                   Math.floor(Math.random() * this.height));
         } while(containsPoint(this.coin, this.segments));
     }
 
-    // ascii representation of snake
+    // ascii representation of the snake
+    // usefull for debugging
     ascii() {
         let str = '';
         for (let row = 0; row < this.height; row++) {
@@ -127,11 +135,14 @@ class Snake {
         return str;
     }
 
+    // pass segments iterator forward to make drawing snake easier
     [Symbol.iterator]() {
         return this.segments[Symbol.iterator]();
     }
 }
 
+// utility that checks a point/segment against an
+// array of points/segments
 function containsPoint(point, arr) {
     for (let arrPoint of arr)
         if (point.x == arrPoint.x && point.y == arrPoint.y)
