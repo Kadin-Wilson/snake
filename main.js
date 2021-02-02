@@ -19,13 +19,28 @@ let snake = new Snake(WIDTH/cellSize, HEIGHT/cellSize, 12, 8, 4);
 
 let previousTime = 0;
 // frames per move
-let moveTick = 30;
+let moveTick = 15;
 let tick = 0;
 
 // initial draw
 draw();
 // start game loop
 gameLoop();
+
+
+// key listeners
+document.addEventListener('keydown', (event) => {
+    const keyName = event.key;
+
+    if (keyName == 'ArrowLeft')
+        snake.changeDirection('left');
+    if (keyName == 'ArrowRight')
+        snake.changeDirection('right');
+    if (keyName == 'ArrowUp')
+        snake.changeDirection('up');
+    if (keyName == 'ArrowDown')
+        snake.changeDirection('down');
+});
 
 function gameLoop(currentTime) {
     // convert to seconds

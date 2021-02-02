@@ -10,7 +10,8 @@ class Snake {
         this.width = width;
         this.height = height;
         this.segments = [];
-        this.direction = 'up';
+        this.queuedDirection = 'up';
+        this.currentDirection = 'up';
 
         if (startY + length > this.width)
             throw RangeError('snake initialized outsied of field');
@@ -24,14 +25,17 @@ class Snake {
     move() {
         let carry = new Point(this.segments[0].x, this.segments[0].y);
 
+        // set our direction to the one that is queued
+        this.currentDirection = this.queuedDirection;
+
         // move first segment
-        if (this.direction == 'up')
+        if (this.currentDirection == 'up')
             this.segments[0].y -= 1;
-        if (this.direction == 'left')
+        if (this.currentDirection == 'left')
             this.segments[0].x -= 1;
-        if (this.direction == 'right')
+        if (this.currentDirection == 'right')
             this.segments[0].x += 1;
-        if (this.direction == 'down')
+        if (this.currentDirection == 'down')
             this.segments[0].y += 1;
 
         // move remaining segments
@@ -40,6 +44,18 @@ class Snake {
             this.segments[i] = carry;
             carry = temp;
         }
+    }
+
+    changeDirection(direction) {
+        // queue the direction we want to move in
+        if(direction == 'left' && this.currentDirection != 'right')
+            this.queuedDirection = 'left';
+        if(direction == 'right' && this.currentDirection != 'left')
+            this.queuedDirection = 'right';
+        if(direction == 'up' && this.currentDirection != 'down')
+            this.queuedDirection = 'up';
+        if(direction == 'down' && this.currentDirection != 'up')
+            this.queuedDirection = 'down';
     }
 
     // ascii representation of snake
