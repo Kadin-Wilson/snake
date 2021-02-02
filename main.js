@@ -22,6 +22,8 @@ let previousTime = 0;
 let moveTick = 15;
 let tick = 0;
 
+let nextFrame = null;
+
 // initial draw
 draw();
 // start game loop
@@ -43,6 +45,8 @@ document.addEventListener('keydown', (event) => {
 });
 
 function gameLoop(currentTime) {
+    nextFrame = requestAnimationFrame(gameLoop);
+
     // convert to seconds
     currentTime *= 0.001;
     // time passed since last frame
@@ -53,12 +57,14 @@ function gameLoop(currentTime) {
     ++tick;
     if (tick > moveTick) {
         snake.move();
-        snake.checkCollision();
+        if (snake.checkCollision()) {
+            cancelAnimationFrame(nextFrame);
+            gameover();
+            return;
+        }
         tick = 0;
         draw(); // only draw when snake moves
     }
-
-    requestAnimationFrame(gameLoop);
 }
 
 function draw() {
@@ -90,4 +96,10 @@ function draw() {
         ctx.fillRect(segment.x * cellSize + segmentMargin,
                      segment.y * cellSize + segmentMargin,
                      segmentSize, segmentSize);
+}
+
+function gameover() {
+    ctx.fillStyle = 'red';
+    ctx.font = `bold ${3*cellSize}px serif`;
+    ctx.fillText('Game Over', WIDTH/7, HEIGHT/2);
 }

@@ -72,7 +72,17 @@ class Snake {
             && this.segments[0].y == this.coin.y) {
             this.setCoin();
             this.grow = true;
+            return false;
         }
+
+        if (this.segments[0].x < 0 || this.segments[0].x >= this.width
+            || this.segments[0].y < 0 || this.segments[0].y >= this.height)
+            return true;
+
+        for (let i = 1; i < this.segments.length; i++)
+            if (this.segments[0].x == this.segments[i].x
+                && this.segments[0].y == this.segments[i].y)
+                return true;
     }
 
     getCoin() {
