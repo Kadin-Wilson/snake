@@ -53,6 +53,7 @@ function gameLoop(currentTime) {
     ++tick;
     if (tick > moveTick) {
         snake.move();
+        snake.checkCollision();
         tick = 0;
         draw(); // only draw when snake moves
     }
@@ -73,6 +74,15 @@ function draw() {
             ctx.arc(i, j, 3, 0, 7);
             ctx.fill();
         }
+
+    // draw coin
+    const coin = snake.getCoin();
+    ctx.fillStyle = 'goldenrod';
+    ctx.beginPath();
+    ctx.arc(coin.x * cellSize + cellSize/2,
+            coin.y * cellSize + cellSize/2, cellSize/2.5, 0, 7);
+    ctx.fill();
+
     
     // draw snake
     ctx.fillStyle = 'white';

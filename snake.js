@@ -12,6 +12,7 @@ class Snake {
         this.segments = [];
         this.queuedDirection = 'up';
         this.currentDirection = 'up';
+        this.grow = false;
 
         if (startY + length > this.width)
             throw RangeError('snake initialized outsied of field');
@@ -20,6 +21,9 @@ class Snake {
         this.segments.push(new Point(startX, startY));
         for (let i = 1; i < length; i++)
             this.segments.push(new Point(startX, startY + i));
+
+        // set coin
+        this.setCoin();
     }
 
     move() {
@@ -44,18 +48,42 @@ class Snake {
             this.segments[i] = carry;
             carry = temp;
         }
+
+        if (this.grow) {
+            this.segments.push(carry);
+            this.grow = false;
+        }
     }
 
     changeDirection(direction) {
         // queue the direction we want to move in
-        if(direction == 'left' && this.currentDirection != 'right')
+        if (direction == 'left' && this.currentDirection != 'right')
             this.queuedDirection = 'left';
-        if(direction == 'right' && this.currentDirection != 'left')
+        if (direction == 'right' && this.currentDirection != 'left')
             this.queuedDirection = 'right';
-        if(direction == 'up' && this.currentDirection != 'down')
+        if (direction == 'up' && this.currentDirection != 'down')
             this.queuedDirection = 'up';
-        if(direction == 'down' && this.currentDirection != 'up')
+        if (direction == 'down' && this.currentDirection != 'up')
             this.queuedDirection = 'down';
+    }
+
+    checkCollision() {
+        if (this.segments[0].x == this.coin.x 
+            && this.segments[0].y == this.coin.y) {
+            this.setCoin();
+            this.grow = true;
+        }
+    }
+
+    getCoin() {
+        return this.coin;
+    }
+
+    setCoin() {
+        do {
+            this.coin = new Point(Math.floor(Math.random() * this.width),
+                                  Math.floor(Math.random() * this.height));
+        } while(containsPoint(this.coin, this.segments));
     }
 
     // ascii representation of snake
