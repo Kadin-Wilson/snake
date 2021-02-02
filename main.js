@@ -3,8 +3,8 @@ import {Snake} from './snake.js'
 const canvas = document.querySelector('#game');
 const ctx = canvas.getContext('2d');
 
-canvas.width = window.innerWidth - (window.innerWidth % 100);
-canvas.height = window.innerHeight - (window.innerHeight % 100);
+canvas.width = Math.min(1100, window.innerWidth - (window.innerWidth % 100));
+canvas.height = Math.min(800, window.innerHeight - (window.innerHeight % 100));
 
 const WIDTH = canvas.width;
 const HEIGHT = canvas.height;
@@ -13,12 +13,14 @@ const cellSize = 50;
 const segmentMargin = 4;
 const segmentSize = cellSize - segmentMargin * 2;
 
+const snakeStartSize = 5;
+
 // create snake
-let snake = new Snake(WIDTH/cellSize, HEIGHT/cellSize, 12, 8, 8);
+let snake = new Snake(WIDTH/cellSize, HEIGHT/cellSize, 12, 8, snakeStartSize);
 
 
 // frames per move
-const moveTick = 15;
+const moveTick = 12;
 const animationIncriment = cellSize / moveTick;
 
 let tick = 0;
@@ -66,17 +68,19 @@ function gameLoop(currentTime) {
         tick = 0;
     }
     draw();
+    ctx.font = 'bold 15 serif'
+    ctx.fillText(`fps: ${1/deltaTime}`,10, 10)
 }
 
 function draw() {
     // clear canvas
-    ctx.fillStyle = 'darkcyan';
+    ctx.fillStyle = 'black';
     ctx.fillRect(0, 0, WIDTH, HEIGHT);
 
     // draw grid
-    ctx.fillStyle = 'black';
     for (let i = 0; i <= WIDTH; i += cellSize)
         for (let j = 0; j <= HEIGHT; j += cellSize) {
+            ctx.fillStyle = `hsl(${i + j}, 100%, 60%`;
             ctx.beginPath();
             ctx.arc(i, j, 3, 0, 7);
             ctx.fill();
@@ -84,10 +88,11 @@ function draw() {
 
     // draw coin
     const coin = snake.getCoin();
-    ctx.fillStyle = 'goldenrod';
+    const cx = coin.x * cellSize + cellSize/2;
+    const cy = coin.y * cellSize + cellSize/2;
+    ctx.fillStyle = `hsl(${cx + cy}, 100%, 60%`;
     ctx.beginPath();
-    ctx.arc(coin.x * cellSize + cellSize/2,
-            coin.y * cellSize + cellSize/2, cellSize/2.5, 0, 7);
+    ctx.arc(cx, cy, cellSize/2.5, 0, 7);
     ctx.fill();
 
     
@@ -110,7 +115,17 @@ function draw() {
 }
 
 function gameover() {
-    ctx.fillStyle = 'red';
+    ctx.globalAlpha = 0.7;
+    ctx.fillStyle = 'black';
+    ctx.fillRect(0, 0, WIDTH, HEIGHT);
+    ctx.globalAlpha = 1;
+
+    ctx.fillStyle = 'darkred';
     ctx.font = `bold ${3*cellSize}px serif`;
-    ctx.fillText('Game Over', WIDTH/7, HEIGHT/2);
+    ctx.fillText('Game Over', WIDTH/12, HEIGHT/2);
+
+    ctx.fillStyle = 'goldenrod';
+    ctx.font = `bold ${1.5*cellSize}px serif`;
+    ctx.fillText(`Score: ${snake.segments.length - snakeStartSize}`,
+                 WIDTH/4, HEIGHT/2 + 1.5*cellSize);
 }
