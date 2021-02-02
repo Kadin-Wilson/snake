@@ -11,18 +11,38 @@ class Snake {
         this.height = height;
         this.segments = [];
         this.direction = 'up';
-        this.open = null;
-        this.collision = false;
 
         if (startY + length > this.width)
             throw RangeError('snake initialized outsied of field');
 
+        // build snake
         this.segments.push(new Point(startX, startY));
         for (let i = 1; i < length; i++)
             this.segments.push(new Point(startX, startY + i));
-        this.open = new Point(startX, startY + length);
     }
 
+    move() {
+        let carry = new Point(this.segments[0].x, this.segments[0].y);
+
+        // move first segment
+        if (this.direction == 'up')
+            this.segments[0].y -= 1;
+        if (this.direction == 'left')
+            this.segments[0].x -= 1;
+        if (this.direction == 'right')
+            this.segments[0].x += 1;
+        if (this.direction == 'down')
+            this.segments[0].y += 1;
+
+        // move remaining segments
+        for (let i = 1; i < this.segments.length; i++) {
+            let temp = this.segments[i];
+            this.segments[i] = carry;
+            carry = temp;
+        }
+    }
+
+    // ascii representation of snake
     ascii() {
         let str = '';
         for (let row = 0; row < this.height; row++) {
