@@ -69,7 +69,7 @@ function start(e) {
 
         // start gameloop
         gameLoop();
-        document.removeEventListener(start);
+        document.removeEventListener('keyup', start);
     }
 }
 
@@ -134,6 +134,10 @@ function gameover() {
     ctx.font = `bold ${1.5*cellSize}px serif`;
     ctx.fillText(`Score: ${snake.segments.length - snakeStartSize}`,
                  WIDTH/4, HEIGHT/2 + 1.5*cellSize);
+
+    // reset snake
+    snake = new Snake(WIDTH/cellSize, HEIGHT/cellSize, 12, 6, snakeStartSize);
+    document.addEventListener('keyup', start);
 }
 
 function drawGrid() {
