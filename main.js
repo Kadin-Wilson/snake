@@ -1,30 +1,40 @@
 import {Snake} from './snake.js'
 
 const canvas = document.querySelector('#game');
-const ctx = canvas.getContext('2d');
-
 canvas.width = Math.min(1100, window.innerWidth - (window.innerWidth % 100));
 canvas.height = Math.min(800, window.innerHeight - (window.innerHeight % 100));
+const ctx = canvas.getContext('2d');
 
 const WIDTH = canvas.width;
 const HEIGHT = canvas.height;
-
 const cellSize = 50;
+
 const segmentMargin = 4;
 const segmentSize = cellSize - segmentMargin * 2;
-
 const snakeStartSize = 7;
-
-// create snake
-let snake = new Snake(WIDTH/cellSize, HEIGHT/cellSize, 12, 6, snakeStartSize);
-
 
 // frames per move
 const moveTick = 10;
 const animationIncriment = cellSize / moveTick;
 
-let tick = 0;
-let nextFrame = null;
+// prerender grid on offscreen canvas
+const gridcvs = document.createElement('canvas');
+gridcvs.width = WIDTH;
+gridcvs.height = HEIGHT;
+const gridctx = gridcvs.getContext('2d');
+gridctx.fillStyle = 'black';
+gridctx.fillRect(0, 0, WIDTH, HEIGHT);
+for (let i = 0; i <= WIDTH; i += cellSize)
+    for (let j = 0; j <= HEIGHT; j += cellSize) {
+        gridctx.fillStyle = `hsl(${i + j}, 100%, 60%`;
+        gridctx.beginPath();
+        gridctx.arc(i, j, 3, 0, 7);
+        gridctx.fill();
+    }
+
+// create snake
+let snake = new Snake(WIDTH/cellSize, HEIGHT/cellSize, 12, 6, snakeStartSize);
+
 
 // initial draw
 drawGrid();
@@ -33,6 +43,10 @@ ctx.fillStyle = 'white';
 ctx.font = `bold ${3*cellSize}px serif`;
 ctx.fillText('Press Space', WIDTH/25, HEIGHT/3);
 ctx.fillText('To Start', WIDTH/6, HEIGHT/3*2);
+
+// gameloop variables
+let tick = 0;
+let nextFrame = null;
 
 // wait for game start
 document.addEventListener('keyup', start);
@@ -78,10 +92,6 @@ function gameLoop(currentTime) {
 }
 
 function draw() {
-    // clear canvas
-    ctx.fillStyle = 'black';
-    ctx.fillRect(0, 0, WIDTH, HEIGHT);
-
     // draw grid
     drawGrid();
 
@@ -127,13 +137,7 @@ function gameover() {
 }
 
 function drawGrid() {
-    for (let i = 0; i <= WIDTH; i += cellSize)
-        for (let j = 0; j <= HEIGHT; j += cellSize) {
-            ctx.fillStyle = `hsl(${i + j}, 100%, 60%`;
-            ctx.beginPath();
-            ctx.arc(i, j, 3, 0, 7);
-            ctx.fill();
-        }
+    ctx.drawImage(gridctx.canvas, 0, 0);
 }
 
 function fadeBlack(alpha) {
