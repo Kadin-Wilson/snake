@@ -14,14 +14,15 @@ const segmentMargin = 4;
 const segmentSize = cellSize - segmentMargin * 2;
 
 // create snake
-let snake = new Snake(WIDTH/cellSize, HEIGHT/cellSize, 12, 8, 4);
+let snake = new Snake(WIDTH/cellSize, HEIGHT/cellSize, 12, 8, 8);
 
 
-let previousTime = 0;
 // frames per move
-let moveTick = 15;
-let tick = 0;
+const moveTick = 15;
+const animationIncriment = cellSize / moveTick;
 
+let tick = 0;
+let previousTime = 0;
 let nextFrame = null;
 
 // initial draw
@@ -63,8 +64,8 @@ function gameLoop(currentTime) {
             return;
         }
         tick = 0;
-        draw(); // only draw when snake moves
     }
+    draw();
 }
 
 function draw() {
@@ -92,10 +93,20 @@ function draw() {
     
     // draw snake
     ctx.fillStyle = 'white';
-    for (let segment of snake)
-        ctx.fillRect(segment.x * cellSize + segmentMargin,
-                     segment.y * cellSize + segmentMargin,
-                     segmentSize, segmentSize);
+    for (let segment of snake) {
+        let x = segment.x * cellSize + segmentMargin;
+        let y = segment.y * cellSize + segmentMargin;
+        let offset = animationIncriment * tick
+
+        if (segment.direction == 'up')
+            ctx.fillRect(x, y + cellSize - offset, segmentSize, segmentSize);
+        if (segment.direction == 'down')
+            ctx.fillRect(x, y - cellSize + offset, segmentSize, segmentSize);
+        if (segment.direction == 'left')
+            ctx.fillRect(x + cellSize - offset, y, segmentSize, segmentSize);
+        if (segment.direction == 'right')
+            ctx.fillRect(x - cellSize + offset, y, segmentSize, segmentSize);
+    }
 }
 
 function gameover() {

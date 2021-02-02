@@ -4,6 +4,12 @@ class Point {
         this.y = y;
     }
 }
+class Segment extends Point {
+    constructor(x, y, direct) {
+        super(x, y);
+        this.direction = direct;
+    }
+}
 
 class Snake {
     constructor(width, height, startX, startY, length) {
@@ -18,29 +24,38 @@ class Snake {
             throw RangeError('snake initialized outsied of field');
 
         // build snake
-        this.segments.push(new Point(startX, startY));
+        this.segments.push(new Segment(startX, startY, 'up'));
         for (let i = 1; i < length; i++)
-            this.segments.push(new Point(startX, startY + i));
+            this.segments.push(new Segment(startX, startY + i, 'up'));
 
         // set coin
         this.setCoin();
     }
 
     move() {
-        let carry = new Point(this.segments[0].x, this.segments[0].y);
+        let carry = new Segment(this.segments[0].x, this.segments[0].y, 
+                                this.segments[0].direction);
 
         // set our direction to the one that is queued
         this.currentDirection = this.queuedDirection;
 
         // move first segment
-        if (this.currentDirection == 'up')
+        if (this.currentDirection == 'up') {
             this.segments[0].y -= 1;
-        if (this.currentDirection == 'left')
+            this.segments[0].direction = 'up';
+        }
+        if (this.currentDirection == 'left') {
             this.segments[0].x -= 1;
-        if (this.currentDirection == 'right')
+            this.segments[0].direction = 'left';
+        }
+        if (this.currentDirection == 'right') {
             this.segments[0].x += 1;
-        if (this.currentDirection == 'down')
+            this.segments[0].direction = 'right';
+        }
+        if (this.currentDirection == 'down') {
             this.segments[0].y += 1;
+            this.segments[0].direction = 'down';
+        }
 
         // move remaining segments
         for (let i = 1; i < this.segments.length; i++) {
